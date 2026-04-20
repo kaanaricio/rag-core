@@ -1,0 +1,132 @@
+[project]
+name = 'rag-core'
+version = '0.1.0'
+description = 'A standalone ingest, index, and retrieval engine for serious RAG workloads.'
+readme = 'README.md'
+license = 'MIT'
+license-files = ['LICENSE']
+requires-python = '>=3.11'
+keywords = ['rag', 'retrieval', 'qdrant', 'search', 'ocr']
+classifiers = [
+  'Development Status :: 3 - Alpha',
+  'Intended Audience :: Developers',
+  'Programming Language :: Python :: 3',
+  'Programming Language :: Python :: 3.11',
+  'Programming Language :: Python :: 3.12',
+  'Topic :: Scientific/Engineering :: Artificial Intelligence',
+]
+urls = {Homepage = 'https://github.com/kaanaricio/rag-core', Repository = 'https://github.com/kaanaricio/rag-core', Issues = 'https://github.com/kaanaricio/rag-core/issues'}
+dependencies = [
+  'beautifulsoup4>=4.12.0',
+  'defusedxml>=0.7.1',
+  'fastembed>=0.4.0',
+  'markdownify>=0.13.1',
+  'openai>=1.0.0',
+  'openpyxl>=3.1.0',
+  'PyMuPDF>=1.24.0',
+  'python-docx>=1.1.0',
+  'python-pptx>=1.0.2',
+  'qdrant-client>=1.12.0',
+]
+
+[project.scripts]
+rag-core = 'rag_core.cli:main'
+
+[project.optional-dependencies]
+semantic = [
+  'magika>=0.5.0',
+  'sentence-transformers>=3.0.0',
+  'tree-sitter-language-pack>=0.7.0',
+]
+html = [
+  'html-to-markdown>=3.0.0',
+]
+rerank = [
+  'cohere>=5.0.0',
+]
+voyage = [
+  'voyageai>=0.3.0',
+]
+zeroentropy = [
+  'zeroentropy>=0.1.0a11',
+]
+
+[dependency-groups]
+dev = [
+  'mypy>=1.11.0',
+  'pre-commit>=3.8.0',
+  'pytest>=8.3.0',
+  'ruff>=0.6.0',
+]
+
+[build-system]
+requires = ['setuptools>=68', 'wheel']
+build-backend = 'setuptools.build_meta'
+
+[tool.setuptools]
+package-dir = {'' = 'src'}
+
+[tool.setuptools.package-data]
+rag_core = ['py.typed']
+
+[tool.setuptools.packages.find]
+where = ['src']
+
+[tool.pytest.ini_options]
+pythonpath = ['src']
+
+[tool.ruff]
+target-version = 'py311'
+src = ['src', 'tests']
+extend-exclude = ['build', 'dist', 'src/rag_core.egg-info', '__pycache__']
+
+[tool.ruff.lint]
+select = ['E4', 'E7', 'E9', 'F']
+
+[tool.ruff.lint.per-file-ignores]
+'src/rag_core/documents/converters/pdf_converter.py' = ['F401']
+'src/rag_core/search/providers/sparse.py' = ['F401']
+
+[tool.mypy]
+python_version = '3.11'
+files = ['src', 'tests', 'examples']
+pretty = true
+show_error_codes = true
+warn_unused_configs = true
+warn_unused_ignores = true
+warn_redundant_casts = true
+warn_return_any = true
+warn_unreachable = true
+check_untyped_defs = true
+no_implicit_optional = true
+disable_error_code = ['import-untyped']
+
+[[tool.mypy.overrides]]
+module = [
+  'chardet',
+  'fastembed',
+  'magika',
+  'openai',
+  'openpyxl',
+  'cohere',
+  'qdrant_client',
+  'qdrant_client.*',
+  'sentence_transformers',
+  'tree_sitter_language_pack',
+]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = [
+  'rag_core.documents.chunking.code',
+  'rag_core.documents.chunking.semantic',
+  'rag_core.documents.converters.code_converter',
+  'rag_core.documents.converters.csv_converter',
+  'rag_core.documents.converters.docx_converter',
+  'rag_core.documents.converters.html_converter',
+  'rag_core.documents.converters.pptx_converter',
+  'rag_core.documents.converters.registry_loader',
+  'rag_core.documents.converters.xlsx_converter',
+  'rag_core.search.providers.sparse',
+]
+ignore_errors = true

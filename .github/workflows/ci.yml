@@ -1,0 +1,48 @@
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.11', '3.12']
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - uses: astral-sh/setup-uv@v8.1.0
+        with:
+          enable-cache: true
+          cache-dependency-glob: uv.lock
+
+      - name: Install dependencies
+        run: uv sync --group dev
+
+      - name: Lint
+        run: uv run ruff check .
+
+      - name: Type check
+        run: uv run mypy src tests examples
+
+      - name: Test
+        run: uv run pytest -q
+
+      - name: Build
+        run: uv build
+
+      - name: Wheel smoke test
+        run: |
+          python -m venv .wheel-smoke
+          . .wheel-smoke/bin/activate
+          pip install dist/*.whl
+          python -c "import rag_core"
+          rag-core doctor --json
